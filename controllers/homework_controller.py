@@ -38,18 +38,15 @@ def download():
 
 @homeworkApi.route('/homework', methods=['POST'])
 def api_post():
-    file = request.files['fileData']
     name = request.form['name']
     classId = request.form['classId']
-    status = request.form['status']
     studentId = request.form['studentId']
-    isFileExist = request.form['isFileExist']
+    date = request.form['date']
+    print('------------------------------\n\n\n')
+    print(date)
 
     homework = homework_service.post(
-        file, name, classId, status, studentId, isFileExist)
-
-    if file.filename != '':
-        file.save(file.filename)
+        name, classId, studentId, date)
 
     return jsonify({"success": True})
 

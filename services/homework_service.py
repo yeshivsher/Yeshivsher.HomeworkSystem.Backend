@@ -44,19 +44,17 @@ def getFileByHomeworkId(id):
     return Homework.query.filter_by(id=id).first()
 
 
-def post(file, name, classId, status, studentId, isFileExist):
+def post(name, classId, studentId, date):
     '''
     Create entity with body
     :param body: request body
     :returns: the created entity
     '''
     body = {
-        "fileData": file.read(),
         "name": name,
         "classId": classId,
-        "status": status,
         "studentId": studentId,
-        "isFileExist": Str2bool.default(isFileExist)
+        "date": date,
     }
     homework = Homework(**body)
     db.session.add(homework)
