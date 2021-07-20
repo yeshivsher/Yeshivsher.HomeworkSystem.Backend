@@ -42,10 +42,11 @@ def api_post():
         "id": student.id,
         "name": student.name,
         "lastName": student.lastName,
-        "classId": student.classIds,
+        "classIds": student.classIds,
         "mail": student.mail,
         "token": studentToken
     }
+    
     return jsonify({"success": True, "data": json.dumps(studentWithoutPassword, ensure_ascii=False, cls=AlchemyEncoder)})
 
 
