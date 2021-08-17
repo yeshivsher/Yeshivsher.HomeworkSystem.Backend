@@ -7,6 +7,9 @@ import json
 from helper.AlchemyEncoder import AlchemyEncoder, AlchemyEncoderForDatetime
 from io import BytesIO
 from flask import Flask, render_template, request, send_file
+from werkzeug.utils import secure_filename
+import os
+import sys
 
 homeworkApi = Blueprint('homework', 'homework')
 
@@ -43,7 +46,6 @@ def api_post():
     studentId = request.form['studentId']
     date = request.form['date']
     print('------------------------------\n\n\n')
-    print(date)
 
     homework = homework_service.post(
         name, classId, studentId, date)
@@ -51,7 +53,24 @@ def api_post():
     return jsonify({"success": True})
 
 
-@homeworkApi.route('/homework/<string:id>', methods=['PUT'])
+@homeworkApi.route('/homework/addExam', methods=['POST'])
+def api_postNewExam():
+    name = request.form['name']
+    classId = request.form['classId']
+    isExam = request.form['isExam']
+    studentId = -1
+    examQuestion = request.files['examQuestion']
+    examSolution = request.files['examSolution']
+    date = request.form['date']
+    argsType = request.form['argsType']
+    
+    homeworkId = homework_service.postNewExam(
+        name, classId, isExam, studentId, examQuestion, examSolution, date, argsType)
+    
+    return jsonify({"success": True, "addId": homeworkId})
+
+
+@ homeworkApi.route('/homework/<string:id>', methods=['PUT'])
 def api_put(id):
     ''' Update entity by id'''
     file = request.files['fileData']
@@ -61,18 +80,17 @@ def api_put(id):
     grade = request.form['grade']
     studentId = request.form['studentId']
     isFileExist = request.form['isFileExist']
-    print(grade)
-
+    argsType = request.form['argsType']
+    isExam = request.form['isExam']
+    examId = request.form['examId']
+    
     homework = homework_service.put(
-        id, file, name, classId, status, grade, studentId, isFileExist)
-
-    if file.filename != '':
-        file.save(file.filename)
+        id, file, name, classId, status, grade, studentId, isFileExist, argsType, isExam, examId)
 
     return jsonify({"success": True})
 
 
-@homeworkApi.route('/homework/updateWithoutFile/<string:id>', methods=['PUT'])
+@ homeworkApi.route('/homework/updateWithoutFile/<string:id>', methods=['PUT'])
 def api_putWithoutFile(id):
     ''' Update entity by id'''
     name = request.form['name']
@@ -80,20 +98,37 @@ def api_putWithoutFile(id):
     status = request.form['status']
     grade = request.form['grade']
     studentId = request.form['studentId']
+    argsType = request.form['argsType']
+    isExam = request.form['isExam']
+    examId = request.form['examId']
+    print(id)
 
     homework = homework_service.putWithoutFile(
-        id,  name, classId, status, grade, studentId)
+        id,  name, classId, status, grade, studentId, argsType, isExam, examId)
 
     return jsonify({"success": True})
+ 
 
-# @ api.route('/homework/<string:id>', methods=['DELETE'])
-# def api_delete(id):
-#     ''' Delete entity by id'''
-#     res = homework_service.delete(id)
-#     return jsonify(res)
+@homeworkApi.route('/homework/pythonCodeCheckerByHomeworkId', methods=['GET'])
+def api_PythonCodeCheckerByHomeworkId():
+    homeworkId = request.args.get('homeworkId')
+
+    grade = homework_service.pythonCodeCheckerByHomeworkId(homeworkId)
+
+    return jsonify({'grade': grade})
 
 
-@homeworkApi.errorhandler(HTTPException)
+@homeworkApi.route('/homework/pythonCodeChecker', methods=['POST'])
+def api_PythonCodeChecker():
+    file = request.files['file']
+
+    grade = homework_service.PostPythonCodeChecker(file)
+
+    return jsonify({'grade': grade})
+
+
+
+@ homeworkApi.errorhandler(HTTPException)
 def handle_exception(e):
     """Return JSON format for HTTP errors."""
     # start with the correct headers and status code from the error

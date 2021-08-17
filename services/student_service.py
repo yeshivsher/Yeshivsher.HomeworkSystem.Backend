@@ -5,11 +5,13 @@ from werkzeug.exceptions import NotFound
 import json
 from helper.AlchemyEncoder import AlchemyEncoder
 
+
 def get():
     '''
     Get all entities
     :returns: all entity
     '''
+    getStudentsListByClassId(1)
     return Student.query.all()
 
 
@@ -44,9 +46,11 @@ def checkNameAndMail(name, mail):
 
     raise NotFound('authenticated faild for: ' + str(mail))
 
+
 def resetPasswordByMail(password, mail):
     studentObj = Student.query.filter_by(mail=mail).first()
-    tempStudent = json.dumps(studentObj, ensure_ascii=False, cls=AlchemyEncoder)
+    tempStudent = json.dumps(
+        studentObj, ensure_ascii=False, cls=AlchemyEncoder)
     student = json.loads(tempStudent)
 
     body = {
@@ -57,7 +61,7 @@ def resetPasswordByMail(password, mail):
         "mail": student["mail"],
         "password": password,
     }
-    
+
     if student:
         student = Student(**body)
         db.session.merge(student)
@@ -95,3 +99,17 @@ def delete(id):
         db.session.commit()
         return {'success': True}
     raise NotFound('no such entity found with id=' + str(id))
+
+#########################
+# helper functoins
+def getStudentsListByClassId(classId):
+    classIdToNumber = int(classId)
+    allStudents = Student.query.all()
+    studentsList = []
+
+    for s in allStudents:
+        classIdsJson = json.loads(s.classIds)
+        if classIdToNumber in classIdsJson:
+            studentsList.append(s.id)
+            
+    return studentsList
