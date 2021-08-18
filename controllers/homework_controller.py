@@ -38,6 +38,14 @@ def download():
 
     return jsonify({'fileData': file.fileData.decode('UTF-8')})
 
+@homeworkApi.route('/homework/getExamQuestionByHomeworkId', methods=['GET'])
+def getExamQuestionByHomeworkId():
+    homeworkId = request.args.get('homeworkId')
+
+    homework = homework_service.getFileByHomeworkId(homeworkId)
+
+    return jsonify({'fileData': homework.examQuestion.decode('UTF-8')})
+
 
 @homeworkApi.route('/homework', methods=['POST'])
 def api_post():
@@ -70,7 +78,7 @@ def api_postNewExam():
     return jsonify({"success": True, "addId": homeworkId})
 
 
-@ homeworkApi.route('/homework/<string:id>', methods=['PUT'])
+@homeworkApi.route('/homework/<string:id>', methods=['PUT'])
 def api_put(id):
     ''' Update entity by id'''
     file = request.files['fileData']
@@ -90,8 +98,10 @@ def api_put(id):
     return jsonify({"success": True})
 
 
-@ homeworkApi.route('/homework/updateWithoutFile/<string:id>', methods=['PUT'])
+@homeworkApi.route('/homework/updateWithoutFile/<string:id>', methods=['PUT'])
 def api_putWithoutFile(id):
+    print(id)
+    
     ''' Update entity by id'''
     name = request.form['name']
     classId = request.form['classId']
@@ -101,7 +111,6 @@ def api_putWithoutFile(id):
     argsType = request.form['argsType']
     isExam = request.form['isExam']
     examId = request.form['examId']
-    print(id)
 
     homework = homework_service.putWithoutFile(
         id,  name, classId, status, grade, studentId, argsType, isExam, examId)
@@ -128,7 +137,7 @@ def api_PythonCodeChecker():
 
 
 
-@ homeworkApi.errorhandler(HTTPException)
+@homeworkApi.errorhandler(HTTPException)
 def handle_exception(e):
     """Return JSON format for HTTP errors."""
     # start with the correct headers and status code from the error

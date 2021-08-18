@@ -98,7 +98,9 @@ def postNewExam(name, classId, isExam, studentId, examQuestion, examSolution, da
     if(argsType == 'INT'):
         examSolutionOutput = PythonCodeChecker.int(contentOfExamSolution)
     elif(argsType == 'FLOAT'):
-        pass
+        examSolutionOutput = PythonCodeChecker.float(contentOfExamSolution)
+    elif(argsType == 'STRING'):
+        examSolutionOutput = PythonCodeChecker.string(contentOfExamSolution)
 
     body = {
         "name": name,
@@ -161,7 +163,7 @@ def putWithoutFile(id,  name, classId, status, grade, studentId, argsType, isExa
     :returns: the updated entity
     '''
     print(studentId)
-    
+
     body = {
         "id": id,
         "name": name,
@@ -181,30 +183,11 @@ def putWithoutFile(id,  name, classId, status, grade, studentId, argsType, isExa
         db.session.commit()
         return homework
     raise NotFound('no such entity found with id=' + str(body['id']))
-    
-    # body = {
-    #     "id": id,
-    #     "name": name,
-    #     "classId": classId,
-    #     "status": status,
-    #     "grade": grade,
-    #     "studentId": studentId,
-    #     "argsType": argsType,
-    #     "isExam": Str2bool.default(isExam),
-    #     "examId": examId
-    # }
-    # homework = Homework.query.get(id)
-    # if homework:
-    #     homework = Homework(**body)
-    #     db.session.merge(homework)
-    #     db.session.flush()
-    #     db.session.commit()
-    #     return homework
-    # raise NotFound('no such entity found with id=' + str(body['id']))
 
 
 def PostPythonCodeChecker(file):
-    examSolutionOutput = PythonCodeChecker.int(file.read())
+    examSolutionOutput = PythonCodeChecker.string(file.read())
+    print(examSolutionOutput)
 
     return examSolutionOutput
 
@@ -212,25 +195,24 @@ def PostPythonCodeChecker(file):
 def pythonCodeCheckerByHomeworkId(id):
     homerowk = Homework.query.filter_by(id=id).first()
     examId = homerowk.examId
-    print(examId)
-    
     exam = Homework.query.filter_by(id=examId).first()
     examSolutionDicStr = exam.examSolutionOutput
-    
-    print(exam.examSolution)
-    print(homerowk.fileData)
-    
+
     # convert string dic to dic object
     examSolutionDic = ast.literal_eval(examSolutionDicStr)
 
-    examSolutionOutput = PythonCodeChecker.int(homerowk.fileData)
-    
-    grade = PythonCodeChecker.compareTwoDicsAsGrade(examSolutionDic, examSolutionOutput)
-    
-    print(examSolutionDic)
-    print(examSolutionOutput)
-    print(grade)
-    
+    contentOfExamSolution = homerowk.fileData
+
+    if(exam.argsType == 'INT'):
+        examSolutionOutput = PythonCodeChecker.int(contentOfExamSolution)
+    elif(exam.argsType == 'FLOAT'):
+        examSolutionOutput = PythonCodeChecker.float(contentOfExamSolution)
+    elif(exam.argsType == 'STRING'):
+        examSolutionOutput = PythonCodeChecker.string(contentOfExamSolution)
+
+    grade = PythonCodeChecker.compareTwoDicsAsGrade(
+        examSolutionDic, examSolutionOutput)
+
     return grade
 
 

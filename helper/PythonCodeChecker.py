@@ -1,5 +1,6 @@
 import ast
 import sys
+import random
 
 result = False
 
@@ -25,13 +26,13 @@ class PythonCodeChecker(str):
 
         return counterForGradeInTests
 
-    def int(str):
+    def int(strOfFile):
         examSolutionOutput = {}
 
         try:
             for n in range(10):
                 sys.argv = [n]
-                exec(str)
+                exec(strOfFile)
 
                 examSolutionOutput[n] = result
         except:
@@ -39,13 +40,16 @@ class PythonCodeChecker(str):
 
         return examSolutionOutput
     
-    def float(str):
+    def float(strOfFile):
         examSolutionOutput = {}
 
         try:
             for n in range(10):
-                sys.argv = [n]
-                exec(str)
+                arg = round(random.uniform(0, 1), 1)
+                arg = arg + n
+                
+                sys.argv = [arg]
+                exec(strOfFile)
 
                 examSolutionOutput[n] = result
         except:
@@ -53,13 +57,15 @@ class PythonCodeChecker(str):
 
         return examSolutionOutput
     
-    def string(str):
+    def string(strOfFile):
         examSolutionOutput = {}
 
         try:
             for n in range(10):
-                sys.argv = [n]
-                exec(str)
+                arg = str(round(random.uniform(0, 1), n))
+                
+                sys.argv = [arg]
+                exec(strOfFile)
 
                 examSolutionOutput[n] = result
         except:

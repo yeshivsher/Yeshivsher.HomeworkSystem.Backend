@@ -116,7 +116,7 @@ def resetPasswordByMail():
 #     return jsonify(res)
 
 
-@ studentApi.errorhandler(HTTPException)
+@studentApi.errorhandler(HTTPException)
 def handle_exception(e):
     """Return JSON format for HTTP errors."""
     # start with the correct headers and status code from the error
