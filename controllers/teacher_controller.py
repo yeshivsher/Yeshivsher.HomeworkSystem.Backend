@@ -24,6 +24,15 @@ def api_get():
     return jsonify({'teachers': teachersToList})
 
 
+@teacherApi.route('/teacher/<string:id>', methods=['GET'])
+def api_getById(id):
+    teacherObj = teacher_service.getById(id)
+
+    teacher = json.dumps(teacherObj, ensure_ascii=False, cls=AlchemyEncoder)
+
+    return jsonify({'teacher': teacher})
+
+
 @teacherApi.route('/teacher', methods=['POST'])
 def api_post():
     ''' Create entity'''
@@ -54,7 +63,8 @@ def login():
         "mail": re["data"][4],
         "token": teacherToken
     }
-    response = jsonify({"isAuthenticated": re["isAuthenticated"], "token": teacherToken, "data": teacherWithoutPassword})
+    response = jsonify(
+        {"isAuthenticated": re["isAuthenticated"], "token": teacherToken, "data": teacherWithoutPassword})
 
     return response
 
@@ -74,6 +84,7 @@ def checkNameAndMail():
     }
     return jsonify({"isAuthenticated": re["isAuthenticated"], "token": teacherToken, "data": teacherWithoutPassword})
 
+
 @teacherApi.route('/teacher/resetpasswordbymail', methods=['put'])
 def resetPasswordByMail():
     password = request.args.get('password')
@@ -90,7 +101,7 @@ def resetPasswordByMail():
         "classIds": teacher["classIds"],
         "mail": teacher["mail"]
     }
-    return jsonify({"isAuthenticated": True,"token": teacherToken, "data": teacherWithoutPassword})
+    return jsonify({"isAuthenticated": True, "token": teacherToken, "data": teacherWithoutPassword})
 
 
 # @ api.route('/teacher/<string:id>', methods=['PUT'])

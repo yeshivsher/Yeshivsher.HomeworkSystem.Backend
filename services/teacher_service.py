@@ -5,12 +5,16 @@ from werkzeug.exceptions import NotFound
 import json
 from helper.AlchemyEncoder import AlchemyEncoder
 
+
 def get():
     '''
     Get all entities
     :returns: all entity
     '''
     return Teacher.query.all()
+
+def getById(id):
+    return Teacher.query.filter_by(id=id).first()
 
 def post(body):
     '''
@@ -39,7 +43,7 @@ def put(body):
     Update entity by id
     :param body: request body
     :returns: the updated entity
-    ''' 
+    '''
     teacher = Teacher.query.get(body['id'])
     if teacher:
         teacher = Teacher(**body)
@@ -59,9 +63,11 @@ def checkNameAndMail(name, mail):
 
     raise NotFound('authenticated faild for: ' + str(mail))
 
+
 def resetPasswordByMail(password, mail):
     teacherObj = Teacher.query.filter_by(mail=mail).first()
-    tempTeacher = json.dumps(teacherObj, ensure_ascii=False, cls=AlchemyEncoder)
+    tempTeacher = json.dumps(
+        teacherObj, ensure_ascii=False, cls=AlchemyEncoder)
     teacher = json.loads(tempTeacher)
 
     body = {
@@ -72,7 +78,7 @@ def resetPasswordByMail(password, mail):
         "mail": teacher["mail"],
         "password": password,
     }
-    
+
     if teacher:
         teacher = Teacher(**body)
         db.session.merge(teacher)
@@ -80,6 +86,33 @@ def resetPasswordByMail(password, mail):
         db.session.commit()
         return teacher
     raise NotFound('resetPasswordByMail faild for: ' + str(mail))
+
+
+def updateTeacherByNewClassIdAndTeacherId(teacherId, classId):
+    teacherObj = Teacher.query.filter_by(id=int(teacherId)).first()
+    tempTeacher = json.dumps(
+        teacherObj, ensure_ascii=False, cls=AlchemyEncoder)
+    teacher = json.loads(tempTeacher)
+    
+    teacherClassesList = json.loads(teacher["classIds"])
+    teacherClassesList.append(classId)
+    
+    body = {
+        "classIds": str(teacherClassesList),
+        "id": teacher["id"],
+        "lastName": teacher["lastName"],
+        "name": teacher["name"],
+        "mail": teacher["mail"],
+        "password": teacher["password"],
+    }
+
+    if teacher:
+        teacher = Teacher(**body)
+        db.session.merge(teacher)
+        db.session.flush()
+        db.session.commit()
+        return teacher
+    raise NotFound('updateTeacherByNewClassId faild for: ' + str(teacherId))
 
 
 def delete(id):
@@ -94,5 +127,3 @@ def delete(id):
         db.session.commit()
         return {'success': True}
     raise NotFound('no such entity found with id=' + str(id))
-
-

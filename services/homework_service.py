@@ -101,6 +101,21 @@ def postNewExam(name, classId, isExam, studentId, examQuestion, examSolution, da
         examSolutionOutput = PythonCodeChecker.float(contentOfExamSolution)
     elif(argsType == 'STRING'):
         examSolutionOutput = PythonCodeChecker.string(contentOfExamSolution)
+    elif(argsType == 'LIST_INT'):
+        examSolutionOutput = PythonCodeChecker.list_int(contentOfExamSolution)
+    elif(argsType == 'LIST_FLOAT'):
+        examSolutionOutput = PythonCodeChecker.list_float(
+            contentOfExamSolution)
+    elif(argsType == 'LIST_STRING'):
+        examSolutionOutput = PythonCodeChecker.list_string(
+            contentOfExamSolution)
+    elif(argsType == 'DIC_INT'):
+        examSolutionOutput = PythonCodeChecker.dic_int(contentOfExamSolution)
+    elif(argsType == 'DIC_FLOAT'):
+        examSolutionOutput = PythonCodeChecker.dic_float(contentOfExamSolution)
+    elif(argsType == 'DIC_STRING'):
+        examSolutionOutput = PythonCodeChecker.dic_string(
+            contentOfExamSolution)
 
     body = {
         "name": name,
@@ -186,7 +201,7 @@ def putWithoutFile(id,  name, classId, status, grade, studentId, argsType, isExa
 
 
 def PostPythonCodeChecker(file):
-    examSolutionOutput = PythonCodeChecker.string(file.read())
+    examSolutionOutput = PythonCodeChecker.dic_string(file.read())
     print(examSolutionOutput)
 
     return examSolutionOutput
@@ -209,11 +224,39 @@ def pythonCodeCheckerByHomeworkId(id):
         examSolutionOutput = PythonCodeChecker.float(contentOfExamSolution)
     elif(exam.argsType == 'STRING'):
         examSolutionOutput = PythonCodeChecker.string(contentOfExamSolution)
+    elif(exam.argsType == 'LIST_INT'):
+        examSolutionOutput = PythonCodeChecker.list_int(contentOfExamSolution)
+    elif(exam.argsType == 'LIST_FLOAT'):
+        examSolutionOutput = PythonCodeChecker.list_float(
+            contentOfExamSolution)
+    elif(exam.argsType == 'LIST_STRING'):
+        examSolutionOutput = PythonCodeChecker.list_string(
+            contentOfExamSolution)
+    elif(exam.argsType == 'DIC_INT'):
+        examSolutionOutput = PythonCodeChecker.dic_int(contentOfExamSolution)
+    elif(exam.argsType == 'DIC_FLOAT'):
+        examSolutionOutput = PythonCodeChecker.dic_float(contentOfExamSolution)
+    elif(exam.argsType == 'DIC_STRING'):
+        examSolutionOutput = PythonCodeChecker.dic_string(
+            contentOfExamSolution)
 
     grade = PythonCodeChecker.compareTwoDicsAsGrade(
         examSolutionDic, examSolutionOutput)
 
-    return grade
+    if examSolutionOutput == 0:
+        return {
+            "grade": grade,
+            "solutionDic": examSolutionDic,
+            "studentSolutionDic": examSolutionOutput,
+            "succeed": False
+        }
+
+    return {
+        "grade": grade,
+        "solutionDic": examSolutionDic,
+        "studentSolutionDic": examSolutionOutput,
+        "succeed": True
+    }
 
 
 def delete(id):

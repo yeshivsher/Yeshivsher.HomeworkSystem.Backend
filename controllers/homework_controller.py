@@ -122,9 +122,9 @@ def api_putWithoutFile(id):
 def api_PythonCodeCheckerByHomeworkId():
     homeworkId = request.args.get('homeworkId')
 
-    grade = homework_service.pythonCodeCheckerByHomeworkId(homeworkId)
+    data = homework_service.pythonCodeCheckerByHomeworkId(homeworkId)
 
-    return jsonify({'grade': grade})
+    return jsonify({'data': data})
 
 
 @homeworkApi.route('/homework/pythonCodeChecker', methods=['POST'])

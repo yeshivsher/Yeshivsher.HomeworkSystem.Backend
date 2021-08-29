@@ -5,8 +5,10 @@ from models.classes import Classes
 from werkzeug.exceptions import HTTPException
 import json
 from helper.AlchemyEncoder import AlchemyEncoder
+import services.teacher_service as teacher_service
 
 classesApi = Blueprint('classes', 'classes')
+
 
 @classesApi.route('/classes', methods=['GET'])
 def api_get():
@@ -14,16 +16,31 @@ def api_get():
     classessToList = []
 
     for t in classess:
-        classessToList.append(json.dumps(t, ensure_ascii=False, cls=AlchemyEncoder))
+        classessToList.append(json.dumps(
+            t, ensure_ascii=False, cls=AlchemyEncoder))
 
     return jsonify({'classes': classessToList})
 
 
-# @ api.route('/classes', methods=['POST'])
-# def api_post():
-#     ''' Create entity'''
-#     classes = classes_service.post(request.json)
-#     return jsonify(classes.as_dict())
+@classesApi.route('/classes', methods=['POST'])
+def api_post():
+    ''' Create entity'''
+    # print('5555555555555555555555555')
+    # print(request.json["className"])
+    # print(request.json) 
+    # return
+    classObj = classes_service.post(
+        {"className": request.json["className"], "credits": int(request.json["credits"])})
+
+    classObjFormated = json.dumps(
+        classObj, ensure_ascii=False, cls=AlchemyEncoder)
+
+    classObjFormated = json.loads(classObjFormated)
+
+    teacher_service.updateTeacherByNewClassIdAndTeacherId(
+        request.json["teacherId"], classObjFormated["id"])
+
+    return jsonify({"success": True, "data": json.dumps(classObj, ensure_ascii=False, cls=AlchemyEncoder)})
 
 
 # @ api.route('/classes/<string:id>', methods=['PUT'])
